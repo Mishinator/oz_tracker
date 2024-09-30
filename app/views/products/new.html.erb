@@ -1,0 +1,19 @@
+<div class="p-3">
+  <%= form_with url: products_path, method: :post do %>
+    <div class="mb-3 w-50">
+      <%= label_tag :urls, "Вставьте ссылки на категории OZ.BY" %>
+      <%= text_area_tag :urls, nil, class: "form-control", rows: 10 %>
+    </div>
+    <% if flash[:alert].present? %>
+      <div class="alert alert-danger">
+        <%= flash[:alert].gsub("\n", "<br>").html_safe %>
+      </div>
+    <% end %>
+    <% if flash[:notice].present? %>
+      <div class="alert alert-success">
+        <%= flash[:notice].gsub("\n", "<br>").html_safe %>
+      </div>
+    <% end %>
+    <%= submit_tag 'Собрать данные', class: 'btn btn-primary' %>
+  <% end %>
+</div>

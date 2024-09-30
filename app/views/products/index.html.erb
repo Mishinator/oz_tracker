@@ -1,0 +1,25 @@
+<div class="p-3">
+  <%= form_with url: filter_products_path, method: :get, remote: true, id: "filter-form" do |f| %>
+    <div class="mb-3 w-50">
+      <%= label_tag :query, "Поиск товара" %>
+      <%= text_field_tag :query, params[:query], placeholder: "Введите название или ссылку товара", class: "form-control" %>
+    </div>
+    <div class="mb-3 w-50">
+      <%= label_tag :start_date, "Начальная дата" %>
+      <%= date_field_tag :start_date, params[:start_date] || Date.today, class: "form-control" %>
+    </div>
+    <div class="mb-3 w-50">
+      <%= label_tag :end_date, "Конечная дата" %>
+      <%= date_field_tag :end_date, params[:end_date] || Date.today, class: "form-control" %>
+    </div>
+    <%= f.submit 'Применить фильтр', class: "btn btn-primary" %>
+  <% end %>
+
+  <div id="products-table" class="mt-3">
+    <%= render partial: "products_table", locals: { product_prices_by_day: @product_prices_by_day, dates_range: @dates_range } %>
+  </div>
+<div class="p-3">
+
+<div class="d-flex justify-content-center apple_pagination">
+  <%= paginate @products, class: 'pagination pagination-lg' %>
+</div>

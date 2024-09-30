@@ -1,6 +1,12 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  require 'sidekiq/web'
+  mount Sidekiq::Web => '/sidekiq'
+  
+  root 'products#new'
 
-  # Defines the root path route ("/")
-  # root "articles#index"
+  resources :products, only: [:new, :create, :index] do
+    collection do
+      get 'filter', to: 'products#filter', as: :filter
+    end
+  end
 end

@@ -5,11 +5,17 @@ ruby "3.2.2"
 
 gem 'bootstrap', '~> 5.1'
 
+gem 'redis'
+
+gem 'sidekiq'
+
 gem 'nokogiri'
 
 gem 'httparty'
 
-gem 'groupdate'  # Для работы с группировкой по датам
+gem 'kaminari'
+
+gem 'groupdate'
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 7.0.4", ">= 7.0.4.3"
@@ -19,6 +25,8 @@ gem "sprockets-rails"
 
 # Use postgresql as the database for Active Record
 gem "pg", "~> 1.1"
+
+gem 'pg_search'
 
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", "~> 5.0"
@@ -70,6 +78,7 @@ group :development do
 
   # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
   # gem "spring"
+   gem "pry"
 end
 
 group :test do
@@ -77,4 +86,11 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
   gem "webdrivers"
+  gem "rspec-rails"
+  gem "factory_bot_rails"
+  gem 'rails-controller-testing'
 end
+
+gem "cssbundling-rails", "~> 1.4"
+
+gem "jsbundling-rails", "~> 1.3"
