@@ -13,6 +13,8 @@ module OzTracker
 
     config.time_zone = 'Moscow'
 
+    config.eager_load = ENV.fetch("RAILS_ENV", "development") == "production"
+
     config.active_job.queue_adapter = :sidekiq
     # Configuration for the application, engines, and railties goes here.
     #
