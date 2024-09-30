@@ -81,6 +81,8 @@ test:
 #
 production:
   <<: *default
-  database: oz_tracker_production
-  username: oz_tracker
-  password: <%= ENV["OZ_TRACKER_DATABASE_PASSWORD"] %>
+  database: <%= ENV['PGDATABASE'] %>
+  username: <%= ENV['PGUSER'] %>
+  password: <%= ENV['PGPASSWORD'] %>
+  host: <%= ENV['PGHOST'] %> 
+  port: <%= ENV['PGPORT'] %> 
