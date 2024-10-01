@@ -2,9 +2,10 @@ FROM ruby:3.2.2
 
 # Set production environment
 ENV RAILS_ENV=production
+ENV RAILS_LOG_TO_STDOUT=true
 
 # Install necessary packages
-RUN apt-get update -qq && apt-get install -y nodejs npm postgresql-client
+RUN apt-get update -qq && apt-get install -y nodejs npm postgresql-client libvips-dev imagemagick && rm -rf /var/lib/apt/lists/*
 
 # Install Yarn
 RUN npm install --global yarn
@@ -16,13 +17,13 @@ WORKDIR /app
 COPY Gemfile Gemfile.lock ./
 
 # Install Ruby dependencies
-RUN bundle install
+RUN bundle install --without development test
 
 # Copy the entire application
 COPY . .
 
 # Install Node dependencies
-RUN yarn install
+RUN yarn install --production
 
 # Install esbuild
 RUN yarn add esbuild
