@@ -2,10 +2,9 @@ FROM ruby:3.2.2
 
 # Set production environment
 ENV RAILS_ENV=production
-ENV RAILS_LOG_TO_STDOUT=true
 
 # Install necessary packages
-RUN apt-get update -qq && apt-get install -y nodejs npm postgresql-client libvips-dev imagemagick && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -qq && apt-get install -y nodejs npm postgresql-client
 
 # Install Yarn
 RUN npm install --global yarn
@@ -17,19 +16,19 @@ WORKDIR /app
 COPY Gemfile Gemfile.lock ./
 
 # Install Ruby dependencies
-RUN bundle install --without development test
+RUN bundle install
 
-# Install Node dependencies
-RUN yarn install --production
-
-# Copy the entire application code
+# Copy the entire application
 COPY . .
 
-# Precompile bootsnap code for faster boot times
-RUN bundle exec bootsnap precompile app/ lib/
+# Install Node dependencies
+RUN yarn install
 
-# Precompiling assets for production without requiring secret RAILS_MASTER_KEY
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
+# Install esbuild
+RUN yarn add esbuild
+
+# Precompile assets
+RUN rails assets:precompile
 
 # Set the default command to run the server
 CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
