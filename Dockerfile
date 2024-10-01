@@ -25,8 +25,11 @@ RUN yarn install --production
 # Copy the entire application code
 COPY . .
 
-# Precompile assets
-RUN RAILS_ENV=production bundle exec rails assets:precompile --trace
+# Precompile bootsnap code for faster boot times
+RUN bundle exec bootsnap precompile app/ lib/
+
+# Precompiling assets for production without requiring secret RAILS_MASTER_KEY
+RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
 # Set the default command to run the server
 CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
