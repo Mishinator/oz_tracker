@@ -1,34 +1,65 @@
-FROM ruby:3.2.2
+# syntax = docker/dockerfile:1
+
+# Make sure RUBY_VERSION matches the Ruby version in .ruby-version and Gemfile
+ARG RUBY_VERSION=3.2.2
+FROM ruby:$RUBY_VERSION-slim as base
+
+# Rails app lives here
+WORKDIR /rails
 
 # Set production environment
-ENV RAILS_ENV=production
+ENV RAILS_ENV="production" \
+    BUNDLE_DEPLOYMENT="1" \
+    BUNDLE_PATH="/usr/local/bundle" \
+    BUNDLE_WITHOUT="development"
 
-# Install necessary packages
-RUN apt-get update -qq && apt-get install -y nodejs npm postgresql-client
+# Throw-away build stage to reduce size of final image
+FROM base as build
 
-# Install Yarn
-RUN npm install --global yarn
+# Install packages needed to build gems and yarn
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y build-essential git libpq-dev libvips pkg-config curl && \
+    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
+    echo "deb https://dl.yarnpkg.com/debian/ stable main" >> /etc/apt/sources.list.d/yarn.list && \
+    apt-get update && apt-get install --no-install-recommends -y yarn
 
-# Set the application directory
-WORKDIR /app
-
-# Copy Gemfile and Gemfile.lock
+# Install application gems
 COPY Gemfile Gemfile.lock ./
+RUN bundle install && \
+    rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
+    bundle exec bootsnap precompile --gemfile
 
-# Install Ruby dependencies
-RUN bundle install
-
-# Copy the entire application
+# Copy application code
 COPY . .
 
-# Install Node dependencies
-RUN yarn install
+# Install JavaScript dependencies
+RUN yarn install --production
 
-# Install esbuild
-RUN yarn add esbuild
+# Precompile bootsnap code for faster boot times
+RUN bundle exec bootsnap precompile app/ lib/
 
-# Precompile assets
-RUN rails assets:precompile
+# Precompiling assets for production without requiring secret RAILS_MASTER_KEY
+RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
-# Set the default command to run the server
-CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
+# Final stage for app image
+FROM base
+
+# Install packages needed for deployment
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y curl postgresql-client libvips && \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+# Copy built artifacts: gems, application
+COPY --from=build /usr/local/bundle /usr/local/bundle
+COPY --from=build /rails /rails
+
+# Run and own only the runtime files as a non-root user for security
+RUN useradd rails --create-home --shell /bin/bash && \
+    chown -R rails:rails db log storage tmp
+USER rails:rails
+
+# Entrypoint prepares the database.
+ENTRYPOINT ["/rails/bin/docker-entrypoint"]
+
+# Run database migrations and then start the server
+CMD ["sh", "-c", "bin/rails db:migrate && ./bin/rails server -b 0.0.0.0"]
