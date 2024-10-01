@@ -19,17 +19,14 @@ COPY Gemfile Gemfile.lock ./
 # Install Ruby dependencies
 RUN bundle install --without development test
 
-# Copy the entire application
-COPY . .
-
 # Install Node dependencies
 RUN yarn install --production
 
-# Install esbuild
-RUN yarn add esbuild
+# Copy the entire application code
+COPY . .
 
-# Предварительная компиляция ассетов
-RUN RAILS_ENV=production bundle exec rails assets:precompile
+# Precompile assets
+RUN RAILS_ENV=production bundle exec rails assets:precompile --trace
 
 # Set the default command to run the server
 CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
