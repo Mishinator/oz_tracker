@@ -6,6 +6,10 @@ default: &default
   password: password
   host: 127.0.0.1
 
+development:
+  <<: *default
+  database: test_db
+
 test:
   <<: *default
   database: test_db
