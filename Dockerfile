@@ -28,5 +28,8 @@ RUN yarn install --production
 # Install esbuild
 RUN yarn add esbuild
 
+# Предварительная компиляция ассетов
+RUN RAILS_ENV=production bundle exec rails assets:precompile
+
 # Set the default command to run the server
 CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
