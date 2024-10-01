@@ -15,8 +15,6 @@ gem 'httparty'
 
 gem 'kaminari'
 
-gem 'groupdate'
-
 gem 'kamal'
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"

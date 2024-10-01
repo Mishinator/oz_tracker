@@ -86,5 +86,43 @@ RSpec.describe ProductsController, type: :controller do
         expect(assigns(:products)).to include(product)
       end
     end
+
+    context "with valid product link query" do
+      it "returns the product matching the provided link" do
+        product1 = create(:product, url: "https://oz.by/books/matching-product.html")
+        product2 = create(:product, url: "https://oz.by/books/non-matching-product.html")
+        
+        post :filter, params: { start_date: Date.today, end_date: Date.today, query: "https://oz.by/books/matching-product.html" }
+        
+        expect(assigns(:products)).to include(product1)
+        expect(assigns(:products)).not_to include(product2)
+      end
+    end
+  
+    context "with full URL provided" do
+      it "finds the product" do
+        product1 = create(:product, url: "https://oz.by/books/existing-product.html")
+        post :filter, params: { start_date: Date.today, end_date: Date.today, query: "https://oz.by/books/existing-product.html" }
+        
+        expect(assigns(:products)).to include(product1)
+      end
+    end
+  
+    context "with partial URL provided" do
+      it "does not find the product" do
+        product1 = create(:product, url: "https://oz.by/books/existing-product.html")
+        post :filter, params: { start_date: Date.today, end_date: Date.today, query: "https://oz.by/books/existing" }
+        
+        expect(assigns(:products)).to be_empty
+      end
+    end
+  
+    context "with non-existent URL provided" do
+      it "does not return any product" do
+        post :filter, params: { start_date: Date.today, end_date: Date.today, query: "https://oz.by/books/non-existent-product.html" }
+        
+        expect(assigns(:products)).to be_empty
+      end
+    end
   end
 end
