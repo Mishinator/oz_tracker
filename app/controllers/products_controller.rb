@@ -37,7 +37,11 @@ class ProductsController < ApplicationController
     base_query = Product.joins(:prices).distinct
     return base_query if query.blank?
 
-    base_query.where("products.name ILIKE ? OR products.url ILIKE ?", "%#{query}%", "%#{query}%")
+    if query.include?("http://") || query.include?("https://")
+      base_query.where("products.url = ?", query)
+    else
+      base_query.where("products.name ILIKE ?", "%#{query}%")
+    end
   end
 
   def parse_dates(start_date, end_date)
