@@ -1,8 +1,5 @@
 service: oz-tracker
 
-# Name of the container image.
-image: mishinator/oz-tracker
-
 # Deploy to these servers.
 servers:
   web:
@@ -29,14 +26,14 @@ builder:
   arch: amd64
 
 env:
-  DATABASE_URL: <%= ENV['DATABASE_URL'] %>
-  PGDATABASE: <%= ENV['PGDATABASE'] %>
-  PGUSER: <%= ENV['PGUSER'] %>
-  PGPASSWORD: <%= ENV['PGPASSWORD'] %>
-  PGHOST: <%= ENV['PGHOST'] %>
-  PGPORT: <%= ENV['PGPORT'] %>
-  REDIS_URL: <%= ENV['REDIS_URL'] %>
-  SECRET_KEY_BASE: <%= ENV['SECRET_KEY_BASE'] %>
-  RAILS_ENV: <%= ENV['RAILS_ENV'] %>
+  DATABASE_URL: ENV['DATABASE_URL
+  PGDATABASE: ENV['PGDATABASE']
+  PGUSER: ENV['PGUSER']
+  PGPASSWORD: ENV['PGPASSWORD']
+  PGHOST: ENV['PGHOST']
+  PGPORT: ENV['PGPORT']
+  REDIS_URL: ENV['REDIS_URL']
+  SECRET_KEY_BASE: ENV['SECRET_KEY_BASE']
+  RAILS_ENV: ENV['RAILS_ENV']
   secret:
     - RAILS_MASTER_KEY
